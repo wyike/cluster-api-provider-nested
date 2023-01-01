@@ -347,6 +347,8 @@ func completeTemplates(templates map[string]string, clusterName string) (map[str
 			ret[kubeadm.ControllerManager] = completeKCMPodSpec(pod, clusterName)
 		case kubeadm.Etcd:
 			ret[kubeadm.Etcd] = completeEtcdPodSpec(pod, clusterName)
+		case kubeadm.Scheduler:
+			ret[kubeadm.Scheduler] = completeKSCPodSpec(pod, clusterName)
 		default:
 			return nil, errors.New("unknown component: " + name)
 		}
@@ -668,6 +670,98 @@ func completeEtcdPodSpec(pod corev1.Pod, clusterName string) corev1.Pod {
 				Secret: &corev1.SecretVolumeSource{
 					DefaultMode: &volSrtMode,
 					SecretName:  clusterName + "-etcd-health-client",
+				},
+			},
+		},
+	}
+	pod.Spec = ps
+	return pod
+}
+
+// completeKSCPodSpec sets volumes and other fields for the kube-scheduler pod spec.
+func completeKSCPodSpec(pod corev1.Pod, clusterName string) corev1.Pod {
+	ps := pod.Spec
+	ps.Containers[0].VolumeMounts = []corev1.VolumeMount{
+		{
+			MountPath: "/etc/kubernetes/pki/root/ca",
+			Name:      clusterName + "-ca",
+			ReadOnly:  true,
+		},
+		{
+			MountPath: "/etc/kubernetes/pki/root",
+			Name:      clusterName + "-apiserver-client",
+			ReadOnly:  true,
+		},
+		{
+			MountPath: "/etc/kubernetes/pki/service-account",
+			Name:      clusterName + "-sa",
+			ReadOnly:  true,
+		},
+		{
+			MountPath: "/etc/kubernetes/pki/proxy/ca",
+			Name:      clusterName + "-proxy",
+			ReadOnly:  true,
+		},
+		{
+			MountPath: "/etc/kubernetes/kubeconfig",
+			Name:      clusterName + "-kubeconfig",
+			ReadOnly:  true,
+		},
+	}
+
+	// disable the hostnetwork
+	ps.HostNetwork = false
+
+	var volSrtMode int32 = 420
+	ps.Volumes = []corev1.Volume{
+		{
+			Name: clusterName + "-ca",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					DefaultMode: &volSrtMode,
+					SecretName:  clusterName + "-ca",
+				},
+			},
+		},
+		{
+			Name: clusterName + "-apiserver-client",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					DefaultMode: &volSrtMode,
+					SecretName:  clusterName + "-apiserver-client",
+				},
+			},
+		},
+		{
+			Name: clusterName + "-sa",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					DefaultMode: &volSrtMode,
+					SecretName:  clusterName + "-sa",
+				},
+			},
+		},
+		{
+			Name: clusterName + "-proxy",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					DefaultMode: &volSrtMode,
+					SecretName:  clusterName + "-proxy",
+				},
+			},
+		},
+		{
+			Name: clusterName + "-kubeconfig",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					DefaultMode: &volSrtMode,
+					SecretName:  clusterName + "-kubeconfig",
+					Items: []corev1.KeyToPath{
+						{
+							Key:  "value",
+							Path: "controller-manager-kubeconfig",
+						},
+					},
 				},
 			},
 		},

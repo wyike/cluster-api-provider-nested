@@ -1,0 +1,16 @@
+[
+  {
+    "name": "nestedcp",
+    "config": {
+      "image": "gcr.io/k8s-staging-cluster-api-nested/nested-controlplane-controller",
+      "live_reload_deps": [
+        "main.go",
+        "go.mod",
+        "go.sum",
+        "api",
+        "controlplane/nested"
+      ],
+      "label": "CAPNCP"
+    }
+  }
+]

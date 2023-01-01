@@ -1,0 +1,16 @@
+[
+  {
+    "name": "nested",
+    "config": {
+      "image": "gcr.io/k8s-staging-cluster-api-nested/cluster-api-nested-controller",
+      "live_reload_deps": [
+        "main.go",
+        "go.mod",
+        "go.sum",
+        "api",
+        "controllers"
+      ],
+      "label": "CAPN"
+    }
+  }
+]

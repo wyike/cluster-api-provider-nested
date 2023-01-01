@@ -40,4 +40,13 @@ resources:
   kind: NestedControllerManager
   path: sigs.k8s.io/cluster-api-provider-nested/controlplane/api/v1alpha4
   version: v1alpha4
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: cluster.x-k8s.io
+  group: controlplane
+  kind: Nestedscheduler
+  path: sigs.k8s.io/cluster-api-provider-nested/api/v1alpha4
+  version: v1alpha4
 version: "3"

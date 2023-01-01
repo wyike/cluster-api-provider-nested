@@ -71,7 +71,17 @@ controllerManager:
     root-ca-file:                     /etc/kubernetes/pki/root/ca/tls.crt
     service-account-private-key-file: /etc/kubernetes/pki/service-account/tls.key
     controllers:                      "*,-nodelifecycle,bootstrapsigner,tokencleaner"
-       
+     
+scheduler:
+  extraArgs:
+    bind-address:                     0.0.0.0
+    kubeconfig:                       /etc/kubernetes/kubeconfig/scheduler-kubeconfig
+    authorization-kubeconfig:         /etc/kubernetes/kubeconfig/scheduler-kubeconfig
+    authentication-kubeconfig:        /etc/kubernetes/kubeconfig/scheduler-kubeconfig
+    leader-elect:                     "false"
+    requestheader-client-ca-file:     /etc/kubernetes/pki/proxy/ca/tls.crt
+    client-ca-file:                   ""
+
 etcd:
   local:
     dataDir: /var/lib/etcd
@@ -123,6 +133,8 @@ func GenerateTemplates(log logr.Logger, clusterName string) (map[string]string, 
 	KASSubcommand = append(KASSubcommand, "--rootfs", "/"+clusterName)
 	KCMSubcommand = append(KCMSubcommand, "--rootfs", "/"+clusterName)
 	EtcdSubcommand = append(EtcdSubcommand, "--rootfs", "/"+clusterName)
+	KSCSubcommand = append(KSCSubcommand, "--rootfs", "/"+clusterName)
+	AddonSubcommand = append(AddonSubcommand, "--rootfs", "/"+clusterName)
 	// generate the manifests
 	if err := execCommand(log, KubeadmExecPath, KASSubcommand...); err != nil {
 		return nil, errors.Wrap(err, "fail to generate the apiserver manifests")
@@ -132,6 +144,12 @@ func GenerateTemplates(log logr.Logger, clusterName string) (map[string]string, 
 	}
 	if err := execCommand(log, KubeadmExecPath, EtcdSubcommand...); err != nil {
 		return nil, errors.Wrap(err, "fail to generate the etcd manifests")
+	}
+	if err := execCommand(log, KubeadmExecPath, KSCSubcommand...); err != nil {
+		return nil, errors.Wrap(err, "fail to generate the scheduler manifests")
+	}
+	if err := execCommand(log, KubeadmExecPath, AddonSubcommand...); err != nil {
+		return nil, errors.Wrap(err, "fail to generate the addon manifests")
 	}
 	log.Info("static pod manifests generated")
 
@@ -151,11 +169,23 @@ func GenerateTemplates(log logr.Logger, clusterName string) (map[string]string, 
 	if loadErr != nil {
 		return nil, errors.Wrap(loadErr, "fail to load the etcd manifests")
 	}
+	kscPath := filepath.Join("/", clusterName, KSCManifestsPath)
+	KSCManifests, loadErr := ioutil.ReadFile(filepath.Clean(kscPath))
+	if loadErr != nil {
+		return nil, errors.Wrap(loadErr, "fail to load the scheduler manifests")
+	}
+	addonPath := filepath.Join("/", clusterName, AddonManifestsPath)
+	AddonManifests, loadErr := ioutil.ReadFile(filepath.Clean(addonPath))
+	if loadErr != nil {
+		return nil, errors.Wrap(loadErr, "fail to load the addon manifests")
+	}
 
 	return map[string]string{
 		APIServer:         string(KASManifests),
 		ControllerManager: string(KCMManifests),
 		Etcd:              string(EtcdManifests),
+		Scheduler:         string(KSCManifests),
+		Addon:             string(AddonManifests),
 	}, nil
 }
 

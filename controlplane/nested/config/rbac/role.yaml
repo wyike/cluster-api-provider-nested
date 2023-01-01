@@ -160,3 +160,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - controlplane.cluster.x-k8s.io
+  resources:
+  - nestedschedulers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - controlplane.cluster.x-k8s.io
+  resources:
+  - nestedschedulers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - controlplane.cluster.x-k8s.io
+  resources:
+  - nestedschedulers/status
+  verbs:
+  - get
+  - patch
+  - update

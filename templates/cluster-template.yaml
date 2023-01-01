@@ -2,28 +2,28 @@
 apiVersion: cluster.x-k8s.io/v1alpha4
 kind: Cluster
 metadata:
-  name: "${CLUSTER_NAME}"
+  name: "sample"
 spec:
   controlPlaneEndpoint:
     # currently this has to be the in-cluster endpoint, the in-cluster
     # kubeconfig is used by controller-manager w/ ClusterIP services
     # we can `port-forward` this service and be able to test
-    host: "${CLUSTER_NAME}-apiserver"
+    host: "sample-apiserver"
     port: 6443
   infrastructureRef:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
     kind: NestedCluster
-    name: "${CLUSTER_NAME}"
+    name: "sample"
   controlPlaneRef:
     apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
     kind: NestedControlPlane
-    name: "${CLUSTER_NAME}-control-plane"
-  
+    name: "sample-control-plane"
+
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
 kind: NestedCluster
 metadata:
-  name: "${CLUSTER_NAME}"
+  name: "sample"
 spec:
   controlPlaneEndpoint:
     host: "localhost"
@@ -32,38 +32,38 @@ spec:
 apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
 kind: NestedControlPlane
 metadata:
-  name: "${CLUSTER_NAME}-control-plane"
+  name: "sample-control-plane"
 spec:
   etcd:
     apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
     kind: NestedEtcd
-    name: "${CLUSTER_NAME}-nestedetcd"
+    name: "sample-nestedetcd"
   apiserver:
     apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
     kind: NestedAPIServer
-    name: "${CLUSTER_NAME}-nestedapiserver"
+    name: "sample-nestedapiserver"
   controllerManager:
     apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
     kind: NestedControllerManager
-    name: "${CLUSTER_NAME}-nestedcontrollermanager"
+    name: "sample-nestedcontrollermanager"
 ---
 apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
 kind: NestedEtcd
 metadata:
-  name: "${CLUSTER_NAME}-nestedetcd"
+  name: "sample-nestedetcd"
 spec:
   replicas: 1
 ---
 apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
 kind: NestedAPIServer
 metadata:
-  name: "${CLUSTER_NAME}-nestedapiserver"
+  name: "sample-nestedapiserver"
 spec:
   replicas: 1
 ---
 apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
 kind: NestedControllerManager
 metadata:
-  name: "${CLUSTER_NAME}-nestedcontrollermanager"
+  name: "sample-nestedcontrollermanager"
 spec:
   replicas: 1

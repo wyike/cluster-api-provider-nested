@@ -64,4 +64,6 @@ const (
 	Etcd ComponentKind = "NestedEtcd"
 	// ControllerManager defines the kind name for the controller-manager.
 	ControllerManager ComponentKind = "NestedControllerManager"
+	// Scheduler defines the kind name for the scheduler.
+	Scheduler ComponentKind = "NestedScheduler"
 )

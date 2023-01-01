@@ -25,6 +25,10 @@ const (
 	KCMManifestsPath = "/etc/kubernetes/manifests/kube-controller-manager.yaml"
 	// EtcdManifestsPath denotes the Path to the etcd static pod manifest.
 	EtcdManifestsPath = "/etc/kubernetes/manifests/etcd.yaml"
+	// KSCManifestsPath denotes the Path to the scheduler static pod manifest.
+	KSCManifestsPath = "/etc/kubernetes/manifests/kube-scheduler.yaml"
+	// AddonManifestsPath denotes the Path to the controller-manager static pod manifest.
+	AddonManifestsPath = "/etc/kubernetes/manifests/kube-proxy-core-dns.yaml"
 	// DefaultKubeadmConfigPath denotes the Path to the default kubeadm config.
 	DefaultKubeadmConfigPath = "/kubeadm.config"
 	// ManifestsConfigmapSuffix is the name of the configmap that will store the
@@ -36,6 +40,10 @@ const (
 	ControllerManager = "controller-manager"
 	// Etcd denotes the name of the etcd.
 	Etcd = "etcd"
+	// Scheduler denotes the name of the scheduler.
+	Scheduler = "scheduler"
+	// Addon denotes the name of the addons.
+	Addon = "addon"
 )
 
 var (
@@ -45,4 +53,8 @@ var (
 	KCMSubcommand = []string{"init", "phase", "control-plane", "controller-manager", "--config", DefaultKubeadmConfigPath}
 	// EtcdSubcommand is the command that generates the etcd manifest.
 	EtcdSubcommand = []string{"init", "phase", "etcd", "local", "--config", DefaultKubeadmConfigPath}
+	// KSCSubcommand is the command that generates the schedular manifest.
+	KSCSubcommand = []string{"init", "phase", "control-plane", "scheduler", "--config", DefaultKubeadmConfigPath}
+	// AddonSubcommand is the command that generates the addon (coredns, kube-proxy) manifest.
+	AddonSubcommand = []string{"init", "phase", "addon", "all", "--config", DefaultKubeadmConfigPath}
 )
